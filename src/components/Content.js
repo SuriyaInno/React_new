@@ -1,297 +1,150 @@
 import React, { useState } from "react";
 import './Content.css';
 
-import Select from 'react-select';
+const Content = () => {
+    const [segmentName, setSegmentName] = useState('');
+  const [selectedValue, setSelectedValue] = useState("");
+  const [exact, setExact] = useState([]);
+  const [options, setOptions] = useState([
+    { label: "First Name", value: "first_name" },
+    { label: "Last Name", value: "last_name" },
+    { label: "Gender", value: "gender" },
+    { label: "Age", value: "age" },
+    { label: "Account Name", value: "account_name" },
+    { label: "City", value: "city" },
+    { label: "State", value: "state" },
+  ]);
+  
+  const backupOptions = [
+    { label: "First Name", value: "first_name" },
+    { label: "Last Name", value: "last_name" },
+    { label: "Gender", value: "gender" },
+    { label: "Age", value: "age" },
+    { label: "Account Name", value: "account_name" },
+    { label: "City", value: "city" },
+    { label: "State", value: "state" },
+  ];
+  
+  const clickFunction = () => {
+    const exacted = options.find((option) => option.value === selectedValue);
+    if (exacted) {
+      setExact((prevExact) => [...prevExact, exacted]);
+      setOptions((prevOptions) =>
+        prevOptions.filter((option) => option.value !== selectedValue)
+      );
+      setSelectedValue("");
+    }
+  };
 
+  const handleChange = (event) => {
+    setSelectedValue(event.target.value);
+  };
 
-function Content() {
+  const minusTheValue = (index) => {
+    const deletedValue = exact[index];
+    setOptions((prevOptions) => [...prevOptions, deletedValue]);
+    setExact((prevExact) => prevExact.filter((_, i) => i !== index));
+  };
 
-
-
-
-   
-   
-    const [name, setname] = useState();
-    const [finalresponse, setfinalresponse] = useState();
-    const [change, setchange] = useState();
-    const [paragraphs, setParagraphs] = useState([]);
-    const [selectedOption, setSelectedOption] = useState(null);
-    const [selectedOptions, setSelectedOptions] = useState([]);
-    const [selectedOptionss, setSelectedOptionss] = useState([
-
-        { value: 'first_name', label: 'First Name' },
-        { value: 'last_name', label: 'Last Name' },
-        { value: 'gender', label: 'Gender' },
-        { value: 'age', label: 'Age' },
-        { value: 'account_name', label: 'Account Name' },
-        { value: 'city', label: 'City' },
-        { value: 'state', label: 'State' }
-    ]);
-
-    const removeDropdown = (indexToRemove) => {
-        const updatedDropdowns = paragraphs.filter((item, index) => index !== indexToRemove);
-        setParagraphs(updatedDropdowns);
-
-
-
-
-
-        const updated = [...selectedOptionss, selectedOptions[indexToRemove]];
-        // Update the state with the new array
-        setSelectedOptionss(updated);
-
-        // const updateds = [...selectedOptions, selectedOptions[indexToRemove]];
-        // setSelectedOptions(updateds)
-        const updatedValues = selectedOptions.filter(value => value !== selectedOptions[indexToRemove]);
-        setSelectedOptions(updatedValues);
-
-
-
-    };
-
-
-
-    const handleInputChange = (e) => {
-
-
-        if(e){
-        setname(e.target.value);
-      
-        }
-      };
+  const changeFunction = (e, index) => {
+    const searchValue = e.target.value;
+    const newExact = [...exact];
+    const newOption = backupOptions.find((option) => option.value === searchValue);
     
-    const handleChange = selectedOption => {
-        setSelectedOption(selectedOption);
-    };
-    const handleChanges = (e,index) => {
-        // setSelectedOption(selectedOptions);
+    if (newOption) {
+      newExact[index] = newOption;
 
+      setExact(newExact);
+      setOptions((prevOptions) =>
+        prevOptions
+          .filter((option) => option.value !== newOption.value)
+          .concat(exact[index])
+      );
+    }
+  };
 
-//  const lastvalue = selectedOptions;
+  const submitFunction = async () => {
+  
+    const schema = exact.map((item) => ({
+      [item.value]: item.label,
+    }));
 
-//         const finalvalue = e
-
-    // const concat = [...selectedOptionss, lastvalue]
-
-//     selectedOptionss.filter((obj, index, self) =>
-//     index === self.findIndex(o => o.id === obj.id)
-//   );
-
-
-// const concate = [...selectedOptionss.concat(lastvalue)];
-
-// setSelectedOptionss(concate);
-
-// const updatedItems = selectedOptionss.filter(selectedOptionss => selectedOptionss !== finalvalue);
-
-
-
-// setSelectedOptionss(updatedItems);
-// setSelectedOptions(finalvalue)      
+    const postdata = {
+     
+      segment_name: segmentName,
+      schema: schema,
     };
 
-
-
-    function handleClick() {
-
-
-
-
-
-
-
-
-        if (selectedOption) {
-
-            setSelectedOptionss(selectedOptionss.filter(selectedOptionss => selectedOptionss !== selectedOption));
-
-
-
-
-            selectedOptionss.map((selectedOptionss) => {
-
-                const op = selectedOptionss.label;
-
-                if (op != selectedOption.label) {
-
-
-
-
-                }
-                else {
-
-
-
-                    const updatedObjects = [...selectedOptions, selectedOptionss];
-                    // Update the state with the new array
-                    setSelectedOptions(updatedObjects);
-
-
-                }
-
-            })
-
-
-         
-
-
-            const newParagraphs = [...paragraphs, paragraphs.length + 1];
-            setParagraphs(newParagraphs);
-
-
-            setSelectedOption("");
-
-
-
-
-        }
-
-
-
-
-
+    try {
+      const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(postdata),
+      });
+      const result = await response.json();
+      console.log(result);
+    } catch (err) {
+      console.error("Error:", err);
     }
-
-
-
-
-    function final() {
-            
-
-setchange( selectedOptions.map(item =>  `${item.value}:${item.label}`));
-//  console.log(change)
-
-// selectedOptions.map(selectedOptions =>{
-
-//     setchange[selectedOptions.label,selectedOptions.value]
-//     console.log(change)
-// })
-
-
-
-        fetch("https://jsonplaceholder.typicode.com/posts",
-            {
-                method: "post",
-                body: JSON.stringify({
-                    "schema_name": name,
-                    "schema": change
-                }),
-                headers: {
-                    "content-type": "application/json"
-                }
-            }
-
-        ).then((res) => {
-            return res.json();
-          })
-          .then((data) => {
-            console.log(data);
-            setfinalresponse(data);
-          });
-
-
+    finally{
+        setSegmentName('');
+        setExact([]);
+        setOptions(backupOptions)
     }
-    return (<>
+  };
 
-
-        <label htmlFor="namebox" >
-            Enter the Name of the Segment
-            {name}</label>
-
-
-        <input id="namebox" placeholder="Name of the segment" className="nameinput" list="id" onChange={handleInputChange}></input>
-
-        <p className="paratag">
-            To save your segment,you need to add the schemas to build the query
-        </p>
-
-
-        {paragraphs.map((paragraph, index) => (
-
-            <div className="maindiv" key={index}>   <Select className="selectinput"
-                value={selectedOptions[index]}
-                onChange={handleChanges}
-                options={selectedOptionss}
-                
-            />
-                <button onClick={() => removeDropdown(index)}>-</button>
-            </div>
+  return (
+    <div>
+         <h2>Enter the Save segment</h2>
+      <input
+        type="text"
+        placeholder="Enter segment name"
+        value={segmentName}
+        onChange={e => setSegmentName(e.target.value)}
+      />
+<p>To save Your Segement</p>
+<div className="dropdowns-container" style={{marginTop:'10px'}}>
+        {exact.map((dropdown, index) => (
+          <div key={dropdown.value} className="dropdown-item" style={{marginBottom:'5px'}}>
+            <select
+              className="schema-dropdown"
+              value={dropdown.value}
+              onChange={(e) => changeFunction(e, index)}style={{padding:'3px',marginRight:'5px'}}
+            >
+              <option value={dropdown.value}>{dropdown.label}</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <button onClick={() => minusTheValue(index)}>-</button>
+          </div>
         ))}
+      </div>
+      <div  style={{display:'block',marginTop:'10px',marginBottom:'10px'}}>
+      <select id="schema-dropdown" value={selectedValue} onChange={handleChange} style={{padding:'3px',marginRight:'5px'}}>
+        <option value="" disabled>
+          Add schema to segment
+        </option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+        
+      </select>
+      <button onClick={clickFunction}>+</button>
+      </div>
 
 
 
-        <Select
-            value={selectedOption}
-            onChange={handleChange}
-            options={selectedOptionss}
-            placeholder="Add scheme to segement"
-        />
-
-
-
-
-        <p className="addnew" onClick={handleClick}>+Add new schema</p>
-
-
-
-
-
-        <div className="savebutton">
-
-
-            <button onClick={final}>
-                Save segement
-            </button>
-
-        </div>
-
-    </>
-
-    )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<div className="savebutton">
+<button onClick={submitFunction} >Save Segment</button>
+</div>
+   
+    </div>
+  );
+};
 
 export default Content;
